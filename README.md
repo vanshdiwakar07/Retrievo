@@ -19,6 +19,10 @@ Retrievo is a BSc CS project prototype to help a college community report and se
 
 No installation or build step is needed.
 
+## Contact validation
+- A valid 10-digit Indian mobile number beginning with 6–9 is required when submitting a report.
+- Report dates are limited to 1 January 2026 through the current date.
+
 ## Limitation
 This prototype stores records in the current browser only. It does not yet use a shared online database or server, so records do not sync across different devices. Sample records are demo data; do not enter sensitive real information.
 

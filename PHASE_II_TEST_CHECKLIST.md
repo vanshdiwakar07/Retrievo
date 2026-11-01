@@ -8,6 +8,8 @@ Run each test yourself and record the actual outcome before reporting a Pass.
 - [ ] Category filter works.
 - [ ] Submit a valid lost-item report.
 - [ ] Submit a valid found-item report.
+- [ ] Phone field accepts a valid 10-digit Indian mobile number and rejects invalid numbers.
+- [ ] Date field blocks dates before 1 January 2026 and dates after today.
 - [ ] New report remains after refreshing the same browser.
 - [ ] View details displays the correct item and contact.
 - [ ] Mark returned changes the status and count.

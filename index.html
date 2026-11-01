@@ -1,241 +1,145 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Retrievo - A smart college lost and found platform.">
-  <title>Retrievo | Smart Lost & Found</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Retrievo | College Lost & Found</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-
-  <header class="site-header">
-    <div class="container nav">
-      <a href="#" class="logo">Retrievo<span>.</span></a>
-      <nav>
-        <a href="#home">Home</a>
-        <a href="#browse">Browse Items</a>
-        <a href="#how-it-works">How It Works</a>
-      </nav>
-      <button class="btn btn-primary" id="reportBtn">Report an Item</button>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero" id="home">
-      <div class="container hero-content">
-        <div>
-          <p class="eyebrow">SMART COLLEGE LOST & FOUND PLATFORM</p>
-          <h1>Lost Something?<br>Let's <span>Retrievo</span> It.</h1>
-          <p class="hero-text">
-            A simple platform to report lost belongings, find missing items,
-            and reconnect people with what matters.
-          </p>
-          <div class="hero-actions">
-            <a href="#browse" class="btn btn-primary">Find an Item</a>
-            <button class="btn btn-outline" id="heroReportBtn">Report Lost / Found</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="stats-section">
-      <div class="container stats-grid">
-        <div class="stat-card">
-          <h2 id="totalItems">0</h2>
-          <p>Total Reports</p>
-        </div>
-        <div class="stat-card">
-          <h2 id="lostItems">0</h2>
-          <p>Lost Items</p>
-        </div>
-        <div class="stat-card">
-          <h2 id="foundItems">0</h2>
-          <p>Found Items</p>
-        </div>
-        <div class="stat-card">
-          <h2 id="returnedItems">0</h2>
-          <p>Returned Items</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="browse-section section" id="browse">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">EXPLORE REPORTS</p>
-          <h2>Browse Lost & Found Items</h2>
-          <p>Search through reported items and find what you're looking for.</p>
-        </div>
-
-        <div class="search-filter">
-          <input
-            type="search"
-            id="searchInput"
-            placeholder="Search by item name, location or keyword..."
-            aria-label="Search items"
-          >
-
-          <select id="typeFilter" aria-label="Filter by report type">
-            <option value="all">All Reports</option>
-            <option value="Lost">Lost Items</option>
-            <option value="Found">Found Items</option>
-          </select>
-
-          <select id="categoryFilter" aria-label="Filter by category">
-            <option value="all">All Categories</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Accessories">Accessories</option>
-            <option value="Documents">Documents</option>
-            <option value="Books">Books</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div class="items-grid" id="itemsGrid"></div>
-
-        <p class="empty-state" id="emptyState" hidden>
-          No items found. Try another search or filter.
-        </p>
-      </div>
-    </section>
-
-    <section class="how-section section" id="how-it-works">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">SIMPLE PROCESS</p>
-          <h2>How Retrievo Works</h2>
-          <p>Three simple steps to reconnect with your belongings.</p>
-        </div>
-
-        <div class="steps-grid">
-          <div class="step-card">
-            <span class="step-number">01</span>
-            <h3>Report an Item</h3>
-            <p>Submit details of an item you have lost or found.</p>
-          </div>
-          <div class="step-card">
-            <span class="step-number">02</span>
-            <h3>Browse & Search</h3>
-            <p>Explore reports and search using keywords or categories.</p>
-          </div>
-          <div class="step-card">
-            <span class="step-number">03</span>
-            <h3>Reconnect</h3>
-            <p>Use the provided contact details to coordinate its return.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="notice-section">
-      <div class="container">
-        <p><strong>Note:</strong> Please provide accurate item details and valid contact information when submitting a report.</p>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <a href="#" class="logo">Retrievo<span>.</span></a>
-      <p>Bringing lost belongings back to their owners.</p>
-      <p class="copyright">© 2026 Retrievo. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <!-- Report Item Modal -->
-  <dialog id="reportDialog" class="report-dialog">
-    <div class="dialog-header">
-      <div>
-        <p class="eyebrow">SUBMIT A REPORT</p>
-        <h2>Report an Item</h2>
-      </div>
-      <button type="button" class="close-btn" id="closeDialog" aria-label="Close">×</button>
-    </div>
-
-    <form id="reportForm">
-      <div class="form-grid">
-        <label>
-          Report Type
-          <select id="type" required>
-            <option value="">Select type</option>
-            <option value="Lost">Lost</option>
-            <option value="Found">Found</option>
-          </select>
-        </label>
-
-        <label>
-          Item Name
-          <input id="name" type="text" required maxlength="80"
-                 placeholder="e.g. Black Wallet">
-        </label>
-
-        <label>
-          Category
-          <select id="category" required>
-            <option value="">Select category</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Accessories">Accessories</option>
-            <option value="Documents">Documents</option>
-            <option value="Books">Books</option>
-            <option value="Other">Other</option>
-          </select>
-        </label>
-
-        <label>
-          Date
-          <input id="date" type="date" min="2026-01-01" required>
-        </label>
-
-        <label>
-          Location
-          <input id="location" type="text" required maxlength="100"
-                 placeholder="e.g. Library">
-        </label>
-
-        <label>
-          Contact Name
-          <input id="contactName" type="text" required maxlength="80"
-                 placeholder="Your name">
-        </label>
-
-        <label>
-          Contact Email
-          <input id="email" type="email" required maxlength="120"
-                 placeholder="you@example.com">
-        </label>
-
-        <label>
-          Contact Phone Number
-          <input
-            id="phone"
-            type="tel"
-            required
-            maxlength="10"
-            pattern="[6-9][0-9]{9}"
-            inputmode="numeric"
-            placeholder="10-digit mobile number"
-            title="Enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9"
-          >
-        </label>
-
-        <label class="wide">
-          Description
-          <textarea id="description" rows="3" required maxlength="500"
-                    placeholder="Colour, brand, identifying details..."></textarea>
-        </label>
-      </div>
-
-      <div class="dialog-actions">
-        <button type="button" class="btn btn-outline" id="cancelDialog">Cancel</button>
-        <button type="submit" class="btn btn-primary">Submit Report</button>
-      </div>
-    </form>
-  </dialog>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script src="script.js"></script>
+    <header><a class="brand" href="#"><span class="mark">R</span><span><b>Retrievo</b><small>COLLEGE LOST &
+                    FOUND</small></span></a>
+        <nav><a href="#browse">Browse items</a><a href="#how">How it works</a><button id="open-report">+ Report
+                item</button></nav>
+    </header>
+    <main>
+        <section class="hero">
+            <div><span class="eyebrow">LOST SOMETHING? FOUND SOMETHING?</span>
+                <h1>Good things find<br><em>their way back.</em></h1>
+                <p>One place for your campus community to report lost belongings, share found items, and help reunite
+                    people with what matters.</p><button id="lost-btn">I lost something</button> <button
+                    class="secondary" id="found-btn">I found something</button>
+                <p class="tiny">A student project prototype built for a more connected campus.</p>
+            </div>
+            <div class="art">
+                <div class="bubble">R</div>
+                <div class="float f1">👛<b> Wallet</b><small>Personal items</small></div>
+                <div class="float f2">🔑<b> Keys</b><small>Everyday essentials</small></div>
+                <div class="float f3">📚<b> Notebook</b><small>Study essentials</small></div>
+            </div>
+        </section>
+        <section class="stats">
+            <div><b id="total">0</b><span>Total reports</span></div>
+            <div><b id="lost-count">0</b><span>Lost items</span></div>
+            <div><b id="found-count">0</b><span>Found items</span></div>
+            <div><b id="returned-count">0</b><span>Returned</span></div>
+        </section>
+        <section class="section" id="browse">
+            <div class="heading">
+                <div><span class="eyebrow">THE COMMUNITY BOARD</span>
+                    <h2>Browse item reports</h2>
+                    <p>Search listings and check details before contacting the reporter.</p>
+                </div><button id="add-report">+ Add a report</button>
+            </div>
+            <div class="filters"><input id="search" placeholder="Search item, location, description…"
+                    aria-label="Search reports"><select id="type">
+                    <option value="all">All reports</option>
+                    <option value="lost">Lost items</option>
+                    <option value="found">Found items</option>
+                </select><select id="category">
+                    <option value="all">All categories</option>
+                    <option>Electronics</option>
+                    <option>Books & Notes</option>
+                    <option>Wallets & Cards</option>
+                    <option>Keys</option>
+                    <option>Bags</option>
+                    <option>Clothing</option>
+                    <option>Other</option>
+                </select><select id="status">
+                    <option value="active">Active reports</option>
+                    <option value="all">All statuses</option>
+                    <option value="returned">Returned</option>
+                </select></div>
+            <div id="grid" class="grid"></div>
+            <div id="empty" class="empty" hidden>
+                <h3>No matching reports</h3>
+                <p>Try another search or add a new report.</p>
+            </div>
+        </section>
+        <section class="section how" id="how">
+            <div class="heading centered">
+                <div><span class="eyebrow">SIMPLE BY DESIGN</span>
+                    <h2>How Retrievo works</h2>
+                    <p>Three steps to help an item find its way home.</p>
+                </div>
+            </div>
+            <div class="steps">
+                <article><strong>01</strong>
+                    <h3>Report it</h3>
+                    <p>Share an item name, category, date, and location.</p>
+                </article>
+                <article><strong>02</strong>
+                    <h3>Search listings</h3>
+                    <p>Use keywords and filters to find matching reports.</p>
+                </article>
+                <article><strong>03</strong>
+                    <h3>Reconnect</h3>
+                    <p>Contact the reporter and verify ownership before returning an item.</p>
+                </article>
+            </div>
+        </section>
+        <section class="notice">
+            <div>
+                <h2>Keep your information safe.</h2>
+                <p>Do not publish passwords, full card numbers, or other sensitive information. Verify ownership before
+                    handing over an item.</p>
+            </div>🛡️
+        </section>
+    </main>
+    <footer><a class="brand" href="#"><span class="mark">R</span><span><b>Retrievo</b><small>COLLEGE LOST &
+                    FOUND</small></span></a><span>Student project prototype · 2026</span></footer>
+    <dialog id="modal">
+        <form id="form">
+            <div class="modal-head">
+                <div><span class="eyebrow">COMMUNITY REPORT</span>
+                    <h2 id="modal-title">Report an item</h2>
+                </div><button type="button" class="x" id="close">×</button>
+            </div>
+            <div class="form-grid">
+                <label>Report type<select id="item-type" required>
+                        <option value="lost">I lost an item</option>
+                        <option value="found">I found an item</option>
+                    </select></label>
+                <label>Item name<input id="name" maxlength="70" required placeholder="e.g. Blue water bottle"></label>
+                <label>Category<select id="item-category" required>
+                        <option>Electronics</option>
+                        <option>Books & Notes</option>
+                        <option>Wallets & Cards</option>
+                        <option>Keys</option>
+                        <option>Bags</option>
+                        <option>Clothing</option>
+                        <option>Other</option>
+                    </select></label>
+                <label>Date<input id="date" type="date" min="2026-01-01" required></label><label>Location<input id="location" required
+                        maxlength="100" placeholder="e.g. Central Library"></label><label>Your name<input id="reporter"
+                        required maxlength="70" placeholder="Name"></label>
+                <label>Contact email<input id="email" type="email" required maxlength="120"
+                        placeholder="you@example.com"></label>
+                <label>Contact phone<input id="phone" type="tel" inputmode="numeric" autocomplete="tel"
+                        pattern="[6-9][0-9]{9}" maxlength="10" minlength="10" required
+                        placeholder="10-digit Indian mobile number"></label>
+                <label class="wide">Description<textarea id="description" rows="3" required maxlength="500"
+                        placeholder="Colour, brand, identifying details…"></textarea></label>
+            </div>
+            <p class="note">Prototype: reports are saved in this browser only. Do not enter sensitive personal information.</p>
+            <div class="actions"><button type="button" class="secondary" id="cancel">Cancel</button><button
+                    type="submit">Save report</button></div>
+        </form>
+    </dialog>
+    <div id="toast"></div>
+    <script src="script.js"></script>
 </body>
+
 </html>
