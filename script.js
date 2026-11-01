@@ -19,13 +19,88 @@ function render(){
  $('empty').hidden=arr.length>0;$('grid').hidden=arr.length===0;
  $('total').textContent=items.length;$('lost-count').textContent=items.filter(x=>x.type==='lost'&&x.status==='active').length;$('found-count').textContent=items.filter(x=>x.type==='found'&&x.status==='active').length;$('returned-count').textContent=items.filter(x=>x.status==='returned').length;
 }
-function openForm(type='lost'){$('form').reset();$('item-type').value=type;$('modal-title').textContent=type==='lost'?'Report a lost item':'Report a found item';$('date').value=new Date().toISOString().slice(0,10);dlg.showModal()}
+function openForm(type='lost'){
+  $('form').reset();
+  $('item-type').value=type;
+  $('modal-title').textContent=type==='lost'?'Report a lost item':'Report a found item';
+
+  const today = new Date();
+  const localToday = [
+    today.getFullYear(),
+    String(today.getMonth()+1).padStart(2,'0'),
+    String(today.getDate()).padStart(2,'0')
+  ].join('-');
+
+  $('date').min = '2026-01-01';
+  $('date').max = localToday;
+  $('date').value = localToday;
+
+  dlg.showModal();
+}
 function toast(s){const el=$('toast');el.textContent=s;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2500)}
 ['search','type','category','status'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
 ['open-report','add-report'].forEach(id=>$(id).addEventListener('click',()=>openForm()));
 $('lost-btn').addEventListener('click',()=>openForm('lost'));$('found-btn').addEventListener('click',()=>openForm('found'));
 $('close').addEventListener('click',()=>dlg.close());$('cancel').addEventListener('click',()=>dlg.close());
 $('item-type').addEventListener('change',e=>$('modal-title').textContent=e.target.value==='lost'?'Report a lost item':'Report a found item');
-$('form').addEventListener('submit',e=>{e.preventDefault();const x={id:'i'+Date.now(),type:$('item-type').value,name:$('name').value.trim(),category:$('item-category').value,date:$('date').value,location:$('location').value.trim(),reporter:$('reporter').value.trim(),email:$('email').value.trim(),description:$('description').value.trim(),status:'active'};if(!x.name||!x.location||!x.description){toast('Complete all required fields.');return}items.unshift(x);try{persist()}catch(err){items.shift();toast('Could not save in this browser.');return}dlg.close();$('search').value='';$('type').value='all';$('category').value='all';$('status').value='active';render();$('browse').scrollIntoView({behavior:'smooth'});toast('Report saved in this browser.')});
-$('grid').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b)return;const x=items.find(a=>a.id===b.dataset.id);if(!x)return;if(b.dataset.act==='view')alert(`${x.name}\n\nType: ${x.type.toUpperCase()}\nCategory: ${x.category}\nDate: ${dateText(x.date)}\nLocation: ${x.location}\n\nDescription: ${x.description}\n\nReported by: ${x.reporter}\nContact: ${x.email}\n\nVerify ownership before returning an item.`);else if(confirm(`Mark "${x.name}" as returned?`)){x.status='returned';persist();render();toast('Status updated.') }});
+$('form').addEventListener('submit',e=>{
+  e.preventDefault();
+
+  const x={
+    id:'i'+Date.now(),
+    type:$('item-type').value,
+    name:$('name').value.trim(),
+    category:$('item-category').value,
+    date:$('date').value,
+    location:$('location').value.trim(),
+    reporter:$('reporter').value.trim(),
+    email:$('email').value.trim(),
+    phone:$('phone').value.trim(),
+    description:$('description').value.trim(),
+    status:'active'
+  };
+
+  const today=new Date();
+  const localToday=[
+    today.getFullYear(),
+    String(today.getMonth()+1).padStart(2,'0'),
+    String(today.getDate()).padStart(2,'0')
+  ].join('-');
+
+  if(!x.date||x.date<'2026-01-01'||x.date>localToday){
+    toast('Please select a valid date.');
+    return;
+  }
+
+  if(!/^[6-9]\d{9}$/.test(x.phone)){
+    toast('Enter a valid 10-digit mobile number.');
+    return;
+  }
+
+  if(!x.name||!x.location||!x.description){
+    toast('Complete all required fields.');
+    return;
+  }
+
+  items.unshift(x);
+
+  try{
+    persist();
+  }catch(err){
+    items.shift();
+    toast('Could not save in this browser.');
+    return;
+  }
+
+  dlg.close();
+  $('search').value='';
+  $('type').value='all';
+  $('category').value='all';
+  $('status').value='active';
+
+  render();
+  $('browse').scrollIntoView({behavior:'smooth'});
+  toast('Report saved in this browser.');
+});e=>{e.preventDefault();const x={id:'i'+Date.now(),type:$('item-type').value,name:$('name').value.trim(),category:$('item-category').value,date:$('date').value,location:$('location').value.trim(),reporter:$('reporter').value.trim(),email:$('email').value.trim(),description:$('description').value.trim(),status:'active'};if(!x.name||!x.location||!x.description){toast('Complete all required fields.');return}items.unshift(x);try{persist()}catch(err){items.shift();toast('Could not save in this browser.');return}dlg.close();$('search').value='';$('type').value='all';$('category').value='all';$('status').value='active';render();$('browse').scrollIntoView({behavior:'smooth'});toast('Report saved in this browser.')});
+$('grid').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b)return;const x=items.find(a=>a.id===b.dataset.id);if(!x)return;if(b.dataset.act==='view')alert(`${x.name}\n\nType: ${x.type.toUpperCase()}\nCategory: ${x.category}\nDate: ${dateText(x.date)}\nLocation: ${x.location}\n\nDescription: ${x.description}\n\nReported by: ${x.reporter}\nContact Email: ${x.email} Phone: ${x.phone || 'Not provided'}\n\nVerify ownership before returning an item.`);else if(confirm(`Mark "${x.name}" as returned?`)){x.status='returned';persist();render();toast('Status updated.') }});
 render();
