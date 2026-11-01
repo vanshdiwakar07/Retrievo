@@ -1,295 +1,294 @@
-
 const KEY = 'retrievo_items_v1';
 
 const demo = [
-  {id:'d1',type:'found',name:'Blue Water Bottle',category:'Other',date:'2026-10-06',location:'Central Library',description:'Blue reusable bottle found near the reading tables.',reporter:'Demo Student',email:'demo@example.com',status:'active'},
-  {id:'d2',type:'lost',name:'Black Wireless Earbuds',category:'Electronics',date:'2026-10-04',location:'Computer Lab 2',description:'Small black earbuds case. Verify details with the owner.',reporter:'Demo Student',email:'demo@example.com',status:'active'},
-  {id:'d3',type:'found',name:'Green Notebook',category:'Books & Notes',date:'2026-10-03',location:'Block B, Room 104',description:'Notebook found after a lecture.',reporter:'Demo Student',email:'demo@example.com',status:'active'},
-  {id:'d4',type:'lost',name:'Card Holder',category:'Wallets & Cards',date:'2026-10-02',location:'Cafeteria',description:'Dark card holder. Do not share card numbers.',reporter:'Demo Student',email:'demo@example.com',status:'active'},
-  {id:'d5',type:'found',name:'Two Keys on Keychain',category:'Keys',date:'2026-10-01',location:'Sports Ground Entrance',description:'Small keychain found near the entrance.',reporter:'Demo Student',email:'demo@example.com',status:'active'},
-  {id:'d6',type:'lost',name:'Grey Laptop Sleeve',category:'Bags',date:'2026-09-29',location:'Study Lounge',description:'Grey laptop sleeve possibly left beside a desk.',reporter:'Demo Student',email:'demo@example.com',status:'active'}
+  {id:'d1',type:'Found',name:'Blue Water Bottle',category:'Other',date:'2026-10-06',location:'Central Library',description:'Blue reusable bottle found near the reading tables.',reporter:'Demo Student',email:'demo@example.com',phone:'',status:'active'},
+  {id:'d2',type:'Lost',name:'Black Wireless Earbuds',category:'Electronics',date:'2026-10-04',location:'Computer Lab 2',description:'Small black earbuds case. Verify details with the owner.',reporter:'Demo Student',email:'demo@example.com',phone:'',status:'active'},
+  {id:'d3',type:'Found',name:'Green Notebook',category:'Books',date:'2026-10-03',location:'Block B, Room 104',description:'Notebook found after a lecture.',reporter:'Demo Student',email:'demo@example.com',phone:'',status:'active'},
+  {id:'d4',type:'Lost',name:'Card Holder',category:'Accessories',date:'2026-10-02',location:'Cafeteria',description:'Dark card holder. Do not share card numbers.',reporter:'Demo Student',email:'demo@example.com',phone:'',status:'active'},
+  {id:'d5',type:'Found',name:'Two Keys on Keychain',category:'Other',date:'2026-10-01',location:'Sports Ground Entrance',description:'Small keychain found near the entrance.',reporter:'Demo Student',email:'demo@example.com',phone:'',status:'active'},
+  {id:'d6',type:'Lost',name:'Grey Laptop Sleeve',category:'Accessories',date:'2026-09-29',location:'Study Lounge',description:'Grey laptop sleeve possibly left beside a desk.',reporter:'Demo Student',email:'demo@example.com',phone:'',status:'active'}
 ];
 
-let items;
+const $ = id => document.getElementById(id);
+const dialog = $('reportDialog');
+const form = $('reportForm');
+const grid = $('itemsGrid');
+
+let items = [];
 
 try {
-  items = JSON.parse(localStorage.getItem(KEY)) || demo;
-} catch (e) {
-  items = demo;
+  const saved = JSON.parse(localStorage.getItem(KEY));
+  items = Array.isArray(saved) ? saved : demo.slice();
+} catch (error) {
+  items = demo.slice();
 }
-
-const $ = id => document.getElementById(id);
-const dlg = $('modal');
 
 const icons = {
-  'Electronics':'🎧',
-  'Books & Notes':'📚',
-  'Wallets & Cards':'👛',
-  'Keys':'🔑',
-  'Bags':'🎒',
-  'Clothing':'🧥',
-  'Other':'📦'
+  Electronics: '🎧',
+  Accessories: '🎒',
+  Documents: '📄',
+  Books: '📚',
+  Other: '📦'
 };
 
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[c]));
-}
-
-function persist() {
-  localStorage.setItem(KEY, JSON.stringify(items));
-}
-
-function dateText(s) {
-  if (!s) return '';
-  return new Date(s + 'T12:00:00').toLocaleDateString(
-    undefined,
-    {day:'numeric',month:'short',year:'numeric'}
-  );
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
 }
 
 function getToday() {
-  const today = new Date();
+  const now = new Date();
 
   return [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, '0'),
-    String(today.getDate()).padStart(2, '0')
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0')
   ].join('-');
 }
 
+function dateText(value) {
+  if (!value) return '';
+
+  return new Date(value + 'T12:00:00').toLocaleDateString(
+    undefined,
+    {day: 'numeric', month: 'short', year: 'numeric'}
+  );
+}
+
+function saveItems() {
+  localStorage.setItem(KEY, JSON.stringify(items));
+}
+
+function showToast(message) {
+  const toast = $('toast');
+
+  toast.textContent = message;
+  toast.classList.add('show');
+
+  clearTimeout(showToast.timer);
+
+  showToast.timer = setTimeout(
+    () => toast.classList.remove('show'),
+    2600
+  );
+}
+
 function render() {
-  const q = $('search').value.toLowerCase().trim();
-  const t = $('type').value;
-  const c = $('category').value;
-  const s = $('status').value;
+  const query = $('searchInput').value.trim().toLowerCase();
+  const type = $('typeFilter').value;
+  const category = $('categoryFilter').value;
 
-  const arr = items
-    .filter(x =>
-      (!q || [x.name,x.location,x.description,x.category]
-        .join(' ').toLowerCase().includes(q)) &&
-      (t === 'all' || x.type === t) &&
-      (c === 'all' || x.category === c) &&
-      (s === 'all' || x.status === s)
-    )
-    .sort((a,b) => b.date.localeCompare(a.date));
+  const filtered = items
+    .filter(item => {
+      const searchable = [
+        item.name,
+        item.location,
+        item.description,
+        item.category
+      ].join(' ').toLowerCase();
 
-  $('grid').innerHTML = arr.map(x => `
+      return (!query || searchable.includes(query)) &&
+        (type === 'all' || item.type.toLowerCase() === type.toLowerCase()) &&
+        (category === 'all' || item.category === category);
+    })
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  grid.innerHTML = filtered.map(item => `
     <article class="card">
       <div class="cardtop">
-        <span class="pill ${x.status === 'returned' ? 'returned' : x.type}">
-          ${x.status === 'returned' ? 'Returned' : x.type === 'lost' ? 'Lost item' : 'Found item'}
+        <span class="pill ${item.status === 'returned' ? 'returned' : item.type.toLowerCase()}">
+          ${item.status === 'returned' ? 'Returned' : item.type === 'Lost' ? 'Lost item' : 'Found item'}
         </span>
-        <span class="cat">${esc(x.category)}</span>
+        <span class="cat">${esc(item.category)}</span>
       </div>
 
-      <div class="emoji">${icons[x.category] || '📦'}</div>
+      <div class="emoji">${icons[item.category] || '📦'}</div>
 
-      <h3>${esc(x.name)}</h3>
-      <p class="desc">${esc(x.description)}</p>
+      <h3>${esc(item.name)}</h3>
+      <p class="desc">${esc(item.description)}</p>
 
       <div class="meta">
-        ⌖ ${esc(x.location)} &nbsp; · &nbsp; ◷ ${dateText(x.date)}
+        ⌖ ${esc(item.location)} &nbsp; · &nbsp; ◷ ${dateText(item.date)}
       </div>
 
       <div class="actions">
-        <button class="secondary" data-act="view" data-id="${esc(x.id)}">
+        <button type="button" class="secondary"
+          data-act="view" data-id="${esc(item.id)}">
           View details
         </button>
 
-        ${x.status === 'active' ?
-          `<button data-act="return" data-id="${esc(x.id)}">Mark returned</button>`
+        ${item.status !== 'returned'
+          ? `<button type="button" data-act="return"
+              data-id="${esc(item.id)}">Mark returned</button>`
           : ''}
       </div>
     </article>
   `).join('');
 
-  $('empty').hidden = arr.length > 0;
-  $('grid').hidden = arr.length === 0;
+  $('emptyState').hidden = filtered.length !== 0;
+  grid.hidden = filtered.length === 0;
 
-  $('total').textContent = items.length;
+  $('totalItems').textContent = items.length;
 
-  $('lost-count').textContent =
-    items.filter(x => x.type === 'lost' && x.status === 'active').length;
+  $('lostItems').textContent =
+    items.filter(item =>
+      item.type.toLowerCase() === 'lost' &&
+      item.status !== 'returned'
+    ).length;
 
-  $('found-count').textContent =
-    items.filter(x => x.type === 'found' && x.status === 'active').length;
+  $('foundItems').textContent =
+    items.filter(item =>
+      item.type.toLowerCase() === 'found' &&
+      item.status !== 'returned'
+    ).length;
 
-  $('returned-count').textContent =
-    items.filter(x => x.status === 'returned').length;
+  $('returnedItems').textContent =
+    items.filter(item => item.status === 'returned').length;
 }
 
-function openForm(type = 'lost') {
-  $('form').reset();
+function openReport(type = 'Lost') {
+  form.reset();
 
-  $('item-type').value = type;
-
-  $('modal-title').textContent =
-    type === 'lost' ? 'Report a lost item' : 'Report a found item';
-
+  $('type').value = type;
   $('date').min = '2026-01-01';
   $('date').max = getToday();
   $('date').value = getToday();
 
-  dlg.showModal();
+  const heading = dialog.querySelector('.dialog-header h2');
+
+  heading.textContent =
+    type === 'Found'
+      ? 'Report a found item'
+      : 'Report a lost item';
+
+  if (!dialog.open) {
+    dialog.showModal();
+  }
 }
 
-function toast(s) {
-  const el = $('toast');
+$('reportBtn').addEventListener('click', () => openReport());
+$('heroReportBtn').addEventListener('click', () => openReport());
 
-  el.textContent = s;
-  el.classList.add('show');
+$('closeDialog').addEventListener('click', () => dialog.close());
+$('cancelDialog').addEventListener('click', () => dialog.close());
 
-  clearTimeout(toast.timer);
+$('type').addEventListener('change', () => {
+  dialog.querySelector('.dialog-header h2').textContent =
+    $('type').value === 'Found'
+      ? 'Report a found item'
+      : 'Report a lost item';
+});
 
-  toast.timer = setTimeout(
-    () => el.classList.remove('show'),
-    2500
-  );
-}
-
-// Search and filters
-['search','type','category','status'].forEach(id => {
+['searchInput', 'typeFilter', 'categoryFilter'].forEach(id => {
   $(id).addEventListener(
-    id === 'search' ? 'input' : 'change',
+    id === 'searchInput' ? 'input' : 'change',
     render
   );
 });
 
-// Open report form
-['open-report','add-report'].forEach(id => {
-  $(id).addEventListener('click', () => openForm());
-});
+form.addEventListener('submit', event => {
+  event.preventDefault();
 
-$('lost-btn').addEventListener('click', () => openForm('lost'));
-$('found-btn').addEventListener('click', () => openForm('found'));
+  const phone = $('phone').value.trim();
+  const date = $('date').value;
+  const today = getToday();
 
-// Close form
-$('close').addEventListener('click', () => dlg.close());
-$('cancel').addEventListener('click', () => dlg.close());
+  if (!date || date < '2026-01-01' || date > today) {
+    showToast('Choose a date between January 1, 2026 and today.');
+    $('date').focus();
+    return;
+  }
 
-// Change form heading
-$('item-type').addEventListener('change', e => {
-  $('modal-title').textContent =
-    e.target.value === 'lost'
-      ? 'Report a lost item'
-      : 'Report a found item';
-});
+  if (!/^[6-9][0-9]{9}$/.test(phone)) {
+    showToast('Enter a valid 10-digit Indian mobile number.');
+    $('phone').focus();
+    return;
+  }
 
-// Submit report
-$('form').addEventListener('submit', e => {
-  e.preventDefault();
+  if (!form.reportValidity()) return;
 
-  const x = {
+  const newItem = {
     id: 'i' + Date.now(),
-    type: $('item-type').value,
+    type: $('type').value,
     name: $('name').value.trim(),
-    category: $('item-category').value,
-    date: $('date').value,
+    category: $('category').value,
+    date: date,
     location: $('location').value.trim(),
-    reporter: $('reporter').value.trim(),
+    reporter: $('contactName').value.trim(),
     email: $('email').value.trim(),
-    phone: $('phone').value.trim(),
+    phone: phone,
     description: $('description').value.trim(),
     status: 'active'
   };
 
-  const today = getToday();
-
-  // Date validation
-  if (
-    !x.date ||
-    x.date < '2026-01-01' ||
-    x.date > today
-  ) {
-    toast('Please select a valid date between January 1, 2026 and today.');
-    return;
-  }
-
-  // Phone validation
-  if (!/^[6-9][0-9]{9}$/.test(x.phone)) {
-    toast('Enter a valid 10-digit Indian mobile number.');
-    return;
-  }
-
-  if (!x.name || !x.location || !x.description) {
-    toast('Complete all required fields.');
-    return;
-  }
-
-  items.unshift(x);
+  items.unshift(newItem);
 
   try {
-    persist();
-  } catch (err) {
+    saveItems();
+  } catch (error) {
     items.shift();
-    toast('Could not save in this browser.');
+    showToast('Could not save this report in your browser.');
     return;
   }
 
-  dlg.close();
+  dialog.close();
 
-  $('search').value = '';
-  $('type').value = 'all';
-  $('category').value = 'all';
-  $('status').value = 'active';
+  $('searchInput').value = '';
+  $('typeFilter').value = 'all';
+  $('categoryFilter').value = 'all';
 
   render();
 
-  $('browse').scrollIntoView({behavior:'smooth'});
+  $('browse').scrollIntoView({behavior: 'smooth'});
 
-  toast('Report saved in this browser.');
+  showToast('Report submitted successfully!');
 });
 
-// View details and mark returned
-$('grid').addEventListener('click', e => {
-  const b = e.target.closest('button[data-act]');
+grid.addEventListener('click', event => {
+  const button = event.target.closest('button[data-act]');
 
-  if (!b) return;
+  if (!button) return;
 
-  const x = items.find(a => a.id === b.dataset.id);
+  const item = items.find(entry => entry.id === button.dataset.id);
 
-  if (!x) return;
+  if (!item) return;
 
-  if (b.dataset.act === 'view') {
-    alert(
-      `${x.name}
+  if (button.dataset.act === 'view') {
+    alert(`${item.name}
 
-Type: ${x.type.toUpperCase()}
-Category: ${x.category}
-Date: ${dateText(x.date)}
-Location: ${x.location}
+Type: ${item.type}
+Category: ${item.category}
+Date: ${dateText(item.date)}
+Location: ${item.location}
 
-Description: ${x.description}
+Description: ${item.description}
 
-Reported by: ${x.reporter}
-Contact Email: ${x.email}
-Phone: ${x.phone || 'Not provided'}
+Contact Name: ${item.reporter || 'Not provided'}
+Contact Email: ${item.email || 'Not provided'}
+Contact Phone: ${item.phone || 'Not provided'}
 
-Verify ownership before returning an item.`
-    );
+Please verify ownership before returning an item.`);
   }
 
-  else if (b.dataset.act === 'return') {
-    if (confirm(`Mark "${x.name}" as returned?`)) {
-      x.status = 'returned';
+  if (button.dataset.act === 'return' && item.status !== 'returned') {
+    if (confirm(`Mark "${item.name}" as returned?`)) {
+      item.status = 'returned';
 
       try {
-        persist();
+        saveItems();
         render();
-        toast('Status updated.');
-      } catch (err) {
-        x.status = 'active';
-        toast('Could not save this update.');
+        showToast('Item marked as returned.');
+      } catch (error) {
+        item.status = 'active';
+        showToast('Could not save this status update.');
       }
     }
   }
 });
 
-// Initial display
 render();
