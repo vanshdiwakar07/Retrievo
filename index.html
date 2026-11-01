@@ -25,5 +25,10 @@
 <label>Contact phone number
   <input id="phone" type="tel" required maxlength="10"
          pattern="[6-9][0-9]{9}" placeholder="10-digit mobile number">
-</label><input id="email" type="email" required maxlength="120" placeholder="you@example.com"></label><label class="wide">Description<textarea id="description" rows="3" required maxlength="500" placeholder="Colour, brand, identifying details…"></textarea></label></div>
+</label>
+
+<label class="wide">Description
+  <textarea id="description" rows="3" required maxlength="500"
+    placeholder="Colour, brand, identifying details…"></textarea>
+</label></div>
 <p class="note">Prototype: reports are saved in this browser only, not on a shared server.</p><div class="actions"><button type="button" class="secondary" id="cancel">Cancel</button><button type="submit">Save report</button></div></form></dialog><div id="toast"></div><script src="script.js"></script></body></html>
