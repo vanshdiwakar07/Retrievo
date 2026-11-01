@@ -15,6 +15,15 @@
 <label>Report type<select id="item-type" required><option value="lost">I lost an item</option><option value="found">I found an item</option></select></label>
 <label>Item name<input id="name" maxlength="70" required placeholder="e.g. Blue water bottle"></label>
 <label>Category<select id="item-category" required><option>Electronics</option><option>Books & Notes</option><option>Wallets & Cards</option><option>Keys</option><option>Bags</option><option>Clothing</option><option>Other</option></select></label>
-<label>Date<input id="date" type="date" required></label><label>Location<input id="location" required maxlength="100" placeholder="e.g. Central Library"></label><label>Your name<input id="reporter" required maxlength="70" placeholder="Name"></label>
-<label class="wide">Contact email<input id="email" type="email" required maxlength="120" placeholder="you@example.com"></label><label class="wide">Description<textarea id="description" rows="3" required maxlength="500" placeholder="Colour, brand, identifying details…"></textarea></label></div>
+<label>Date
+  <input id="date" type="date" min="2026-01-01" required>
+</label><label>Location<input id="location" required maxlength="100" placeholder="e.g. Central Library"></label><label>Your name<input id="reporter" required maxlength="70" placeholder="Name"></label>
+<label>Contact email
+  <input id="email" type="email" required maxlength="120" placeholder="you@example.com">
+</label>
+
+<label>Contact phone number
+  <input id="phone" type="tel" required maxlength="10"
+         pattern="[6-9][0-9]{9}" placeholder="10-digit mobile number">
+</label><input id="email" type="email" required maxlength="120" placeholder="you@example.com"></label><label class="wide">Description<textarea id="description" rows="3" required maxlength="500" placeholder="Colour, brand, identifying details…"></textarea></label></div>
 <p class="note">Prototype: reports are saved in this browser only, not on a shared server.</p><div class="actions"><button type="button" class="secondary" id="cancel">Cancel</button><button type="submit">Save report</button></div></form></dialog><div id="toast"></div><script src="script.js"></script></body></html>
